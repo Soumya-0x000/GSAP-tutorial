@@ -4,6 +4,147 @@ document.addEventListener("DOMContentLoaded", function () {
   const page1Title = document.getElementById("page1title");
   const windowWidth = window.innerWidth;
   const windowHeight = window.innerHeight;
+  const body = document.body;
+  const image = new Image();
+  image.src = "./assets/GSAPman.png";
+
+  body.style.cursor = "none";
+  let boxesVisible = false;
+  let mousePosition = { x: 0, y: 0 };
+
+  // Hide custom cursor with scale 0 when mouse leaves window
+  body.addEventListener("mouseleave", function () {
+    gsap.to(customCursor, {
+      scale: 0,
+      duration: 0.3,
+      ease: "power1.inOut",
+    });
+  });
+
+  // Show custom cursor with scale 1 when mouse enters window
+  body.addEventListener("mouseenter", function () {
+    gsap.to(customCursor, {
+      scale: 1,
+      duration: 0.3,
+      ease: "power1.inOut",
+    });
+  });
+
+  // Create and style the custom cursor image
+  const customCursor = document.createElement("img");
+  customCursor.src = "./assets/GSAPman.png";
+  customCursor.style.position = "fixed";
+  customCursor.style.width = "48px";
+  customCursor.style.height = "48px";
+  customCursor.style.pointerEvents = "none";
+  customCursor.style.zIndex = 9999;
+  customCursor.style.left = "0px";
+  customCursor.style.top = "0px";
+  customCursor.style.display = "none";
+  customCursor.style.transform = "translate(-50%, -50%)";
+  body.appendChild(customCursor);
+
+  function createCursorTrail(x, y) {
+    const trail = document.createElement("img");
+    trail.src = "./assets/GSAPman.png";
+    trail.style.position = "fixed";
+    trail.style.width = "48px";
+    trail.style.height = "48px";
+    trail.style.pointerEvents = "none";
+    trail.style.zIndex = 9998;
+    trail.style.left = x + "px";
+    trail.style.top = y + "px";
+    trail.style.transform = "translate(-50%, -50%)";
+    trail.style.opacity = "0.08";
+    body.appendChild(trail);
+
+    gsap.to(trail, {
+      opacity: 0,
+      duration: 0.3,
+      ease: "power2.in",
+      onComplete: () => {
+        trail.remove();
+      },
+    });
+  }
+
+  // Single mousemove event listener
+  body.addEventListener("mousemove", function (e) {
+    mousePosition = { x: e.clientX, y: e.clientY };
+
+    // Handle cursor visibility and positioning
+    if (
+      mousePosition.x < 0 ||
+      mousePosition.y < 0 ||
+      mousePosition.x > windowWidth ||
+      mousePosition.y > windowHeight
+    ) {
+      customCursor.style.display = "none";
+      return;
+    }
+
+    customCursor.style.display = "block";
+
+    setTimeout(() => {
+      gsap.to(image, {
+        duration: 0.5,
+        ease: "power1.inOut",
+        x: mousePosition.x - 50,
+        y: mousePosition.y - 50,
+      });
+      customCursor.style.left = e.clientX + "px";
+      customCursor.style.top = e.clientY + "px";
+
+      createCursorTrail(e.clientX, e.clientY);
+    }, 150);
+
+    // Handle box interaction only if boxes are visible
+    if (boxesVisible) {
+      checkBoxProximity();
+    }
+  });
+
+  function getPage1Boxes() {
+    const page1 = document.querySelector(".page-1");
+    if (!page1) return;
+
+    return page1.querySelectorAll(":scope > [class^='box']");
+  }
+  const page1Boxes = getPage1Boxes();
+
+  // Function to check box proximity and move them
+  function checkBoxProximity() {
+    page1Boxes.forEach((box) => {
+      const rect = box.getBoundingClientRect();
+      const boxCenterX = rect.left + rect.width / 2;
+      const boxCenterY = rect.top + rect.height / 2;
+
+      const distance = Math.hypot(
+        mousePosition.x - boxCenterX,
+        mousePosition.y - boxCenterY
+      );
+
+      if (distance <= 200) {
+        // Calculate safe random position within viewport boundaries
+        const boxWidth = 100;
+        const boxHeight = 100;
+        const maxX = windowWidth - boxWidth;
+        const maxY = windowHeight - boxHeight;
+
+        const randomX = Math.max(0, Math.min(maxX, Math.random() * maxX));
+        const randomY = Math.max(0, Math.min(maxY, Math.random() * maxY));
+
+        gsap.to(box, {
+          x: randomX,
+          y: randomY,
+          rotation: Math.random() * 360,
+          scale: 1,
+          duration: 0.5,
+          ease: "power2.out",
+        });
+      }
+    });
+  }
 
   const t1 = gsap.timeline();
   t1.from(".navbar .logo", {
@@ -45,7 +186,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Pause animation on hover, resume on mouseleave
   page1Title.addEventListener("mouseenter", function () {
-    // letterTween.pause();
     letterTween.timeScale(0.5);
     letterSpans.forEach((span, index) => {
       gsap.to(span, {
@@ -60,8 +200,8 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
   });
+
   page1Title.addEventListener("mouseleave", function () {
-    // letterTween.resume();
     letterTween.timeScale(1);
     letterSpans.forEach((span, index) => {
       gsap.to(span, {
@@ -122,7 +262,7 @@ document.addEventListener("DOMContentLoaded", function () {
         gsap.to(".container", {
           y: 100,
           scale: 0.7,
-          skewY: 20, // Tilt in Y axis by 20 degrees
+          skewY: 20,
           rotation: 0,
           borderRadius: "15px",
           duration: 1.2,
@@ -136,6 +276,7 @@ document.addEventListener("DOMContentLoaded", function () {
               });
               btn.disabled = false;
             }, 300);
+
             gsap.to(".container", {
               y: 0,
               scale: 1,
@@ -146,7 +287,7 @@ document.addEventListener("DOMContentLoaded", function () {
               ease: "power1.inOut",
             });
 
-            // Randomly show and animate all 10 boxes
+            // Show and animate all boxes
             const boxes = [];
             for (let i = 1; i <= 30; i++) {
               const box = document.querySelector(`.box${i}`);
@@ -154,40 +295,44 @@ document.addEventListener("DOMContentLoaded", function () {
                 boxes.push(box);
               }
             }
-            // Generate 10 unique, well-separated colors
+
+            // Generate unique colors
             function generateUniqueColors(count) {
               const colors = [];
               const step = Math.floor(360 / count);
               for (let i = 0; i < count; i++) {
-                // Spread hues evenly around the color wheel
                 const hue =
                   (i * step + Math.floor(Math.random() * (step / 2))) % 360;
                 colors.push(`hsl(${hue}, 70%, 60%)`);
               }
-              // Shuffle to randomize order
+              // Shuffle colors
               for (let i = colors.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [colors[i], colors[j]] = [colors[j], colors[i]];
               }
               return colors;
             }
+
             const uniqueColors = generateUniqueColors(boxes.length);
-            // Animate all boxes with stagger and unique, well-separated colors
+            const boxWidth = 100;
+            const boxHeight = 100;
+            const maxX = windowWidth - boxWidth;
+            const maxY = windowHeight - boxHeight;
+
+            // Animate all boxes with proper boundary constraints
             gsap.fromTo(
               boxes,
               {
                 opacity: 0,
-                x: (i) => Math.random() * (window.innerWidth - 100 - 10),
-                y: (i) => Math.random() * (window.innerHeight - 100 - 10),
+                x: (i) => Math.max(0, Math.min(maxX, Math.random() * maxX)),
+                y: (i) => Math.max(0, Math.min(maxY, Math.random() * maxY)),
                 background: (i) => uniqueColors[i],
                 borderRadius: () => `${Math.floor(Math.random() * 51)}%`,
               },
               {
                 opacity: 1,
-                x: (i) =>
-                  Math.max(0, Math.random() * (window.innerWidth - 100 - 10)),
-                y: (i) =>
-                  Math.max(0, Math.random() * (window.innerHeight - 100 - 10)),
+                x: (i) => Math.max(0, Math.min(maxX, Math.random() * maxX)),
+                y: (i) => Math.max(0, Math.min(maxY, Math.random() * maxY)),
                 duration: 1,
                 ease: "back.out(2)",
                 stagger: 0.15,
@@ -195,18 +340,17 @@ document.addEventListener("DOMContentLoaded", function () {
                   this.targets().forEach((box, i) => {
                     box.style.display = "block";
                     box.style.position = "fixed";
-                    box.style.left = "0.5rem";
-                    box.style.right = "0.5rem";
-                    box.style.top = "4rem";
-                    box.style.bottom = "1rem";
-                    box.style.width = "100px";
-                    box.style.height = "100px";
+                    box.style.width = boxWidth + "px";
+                    box.style.height = boxHeight + "px";
                     box.style.borderRadius = "8px";
                     box.style.zIndex = 1000;
                     box.style.background = uniqueColors[i];
                   });
                 },
                 onComplete: function () {
+                  boxesVisible = true; // Enable box interaction
+
+                  // Add click handlers to boxes
                   boxes.forEach((box, i) => {
                     box.addEventListener("click", function () {
                       gsap.to(box, {
@@ -214,37 +358,25 @@ document.addEventListener("DOMContentLoaded", function () {
                         duration: 0.3,
                         ease: "power1.inOut",
                         onComplete: function () {
+                          const newX = Math.max(
+                            0,
+                            Math.min(maxX, Math.random() * maxX)
+                          );
+                          const newY = Math.max(
+                            0,
+                            Math.min(maxY, Math.random() * maxY)
+                          );
+
                           gsap.to(box, {
                             scale: 1,
                             duration: 0.3,
                             ease: "power1.inOut",
                             rotation: 360,
-                            x: Math.random() * (windowWidth - 100 - 10),
-                            y: Math.random() * (windowHeight - 100 - 10),
+                            x: newX,
+                            y: newY,
                           });
                         },
                       });
-                    });
-
-                    box.addEventListener("mousemove", function (e) {
-                      const react = box.getBoundingClientRect();
-                      const boxCenterX = react.left + react.width / 2;
-                      const boxCenterY = react.top + react.height / 2;
-                      const dist = Math.hypot(
-                        e.clientX - boxCenterX,
-                        e.clientY - boxCenterY
-                      );
-
-                      if (dist < 30) {
-                        gsap.to(box, {
-                          scale: 1,
-                          duration: 0.3,
-                          ease: "power1.inOut",
-                          rotation: 360,
-                          x: Math.random() * (windowWidth - 100 - 10),
-                          y: Math.random() * (windowHeight - 100 - 10),
-                        });
-                      }
                     });
                   });
                 },
@@ -258,6 +390,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Helper: Hide boxes one by one
   function hideBoxesSequentially() {
+    boxesVisible = false; // Disable box interaction
+
     const boxes = [];
     for (let i = 1; i <= 30; i++) {
       const box = document.querySelector(`.box${i}`);
@@ -265,6 +399,7 @@ document.addEventListener("DOMContentLoaded", function () {
         boxes.push(box);
       }
     }
+
     boxes.forEach((box, idx) => {
       setTimeout(() => {
         gsap.to(box, {
@@ -284,11 +419,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const page2 = document.querySelector(".page-2");
     if (!page2) return;
     const rect = page2.getBoundingClientRect();
+
     // If top of page-2 is visible in viewport
     if (rect.top < window.innerHeight && !page2Triggered) {
       page2Triggered = true;
       hideBoxesSequentially();
     }
+
     // Reset trigger if user scrolls back up
     if (rect.top > window.innerHeight) {
       page2Triggered = false;

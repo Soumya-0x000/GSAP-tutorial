@@ -6,12 +6,15 @@
 body {
   font-family: Arial, sans-serif;
   min-height: 100vh;
+  cursor: url("assets/GSAPman.png"), auto;
+  overflow-x: hidden;
 }
 :root {
   --page-height: calc(100vh - 4rem);
 }
 .main-container {
   background: #121a2a;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
