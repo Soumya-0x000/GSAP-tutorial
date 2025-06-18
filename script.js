@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
+  gsap.registerPlugin(ScrollTrigger);
+
   const btn = document.getElementById("animateBtn");
   const container = document.querySelector(".container");
   const page1Title = document.getElementById("page1title");
@@ -137,7 +139,7 @@ document.addEventListener("DOMContentLoaded", function () {
         gsap.to(box, {
           x: randomX,
           y: randomY,
-          rotation: Math.random() * 360,
+          rotation: 0,
           scale: 1,
           duration: 0.5,
           ease: "power2.out",
@@ -162,7 +164,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const text = page1Title.textContent;
   const splitText = text.split("");
   page1Title.textContent = "";
-  splitText.forEach((char, index) => {
+  splitText.forEach((char) => {
     const span = document.createElement("span");
     span.textContent = char;
     span.style.display = "inline-block";
@@ -413,22 +415,17 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Detect scroll to page-2 and trigger box hiding
-  let page2Triggered = false;
-  window.addEventListener("scroll", function () {
-    const page2 = document.querySelector(".page-2");
-    if (!page2) return;
-    const rect = page2.getBoundingClientRect();
-
-    // If top of page-2 is visible in viewport
-    if (rect.top < window.innerHeight && !page2Triggered) {
-      page2Triggered = true;
-      hideBoxesSequentially();
-    }
-
-    // Reset trigger if user scrolls back up
-    if (rect.top > window.innerHeight) {
-      page2Triggered = false;
-    }
+  const page2Timeline = gsap.timeline({
+    scrollTrigger: {
+      trigger: ".page-1",
+      start: "top top",
+      end: "bottom top",
+      scrub: true,
+      scroller: ".pages",
+    },
   });
+
+  page2Timeline
+    .to(".page-2", { backgroundColor: "#070707" }, 0)
+    .to(".page-2 .box", { rotation: 360, y: -200 }, 0);
 });
