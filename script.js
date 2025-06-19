@@ -425,7 +425,22 @@ document.addEventListener("DOMContentLoaded", function () {
     },
   });
 
-  page2Timeline
-    .to(".page-2", { backgroundColor: "#070707" }, 0)
-    .to(".page-2 .box", { rotation: 360, y: -200 }, 0);
+  page2Timeline.to(".page-2", { backgroundColor: "#070707" }, 0).to(
+    ".page-2 .box",
+    {
+      rotation: 2860,
+      y: -400,
+      motionPath: {
+        path: [
+          { x: 0, y: 0 },
+          { x: 200, y: 0 },
+          { x: 100, y: -320 },
+          { x: 60, y: -130 },
+          { x: -120, y: 50 },
+          { x: 169, y: 0 },
+        ],
+      },
+    },
+    0
+  );
 });
