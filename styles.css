@@ -59,6 +59,7 @@ body {
   display: flex;
   flex-direction: column;
   flex: 1;
+  overflow-x: hidden;
   overflow-y: auto;
   width: 100%;
   height: var(--page-height);
@@ -119,6 +120,21 @@ body {
   min-height: var(--page-height);
   max-height: var(--page-height);
 }
+
 .main-container .pages .page-2 {
-  background-color: #2f1c3e;
+  background-color: #121a2a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: 100vh;
+}
+.main-container .pages .page-2 .animate-box {
+  width: 100px;
+  height: 100px;
+  background: #97f19a;
+  border-radius: 8px;
+}
+.main-container .pages .page-2 .animate-box h3 {
+  display: none;
 }

@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
+  gsap.registerPlugin(ScrollTrigger);
+
   const btn = document.getElementById("animateBtn");
   const container = document.querySelector(".container");
   const page1Title = document.getElementById("page1title");
@@ -137,7 +139,7 @@ document.addEventListener("DOMContentLoaded", function () {
         gsap.to(box, {
           x: randomX,
           y: randomY,
-          rotation: Math.random() * 360,
+          rotation: 0,
           scale: 1,
           duration: 0.5,
           ease: "power2.out",
@@ -162,7 +164,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const text = page1Title.textContent;
   const splitText = text.split("");
   page1Title.textContent = "";
-  splitText.forEach((char, index) => {
+  splitText.forEach((char) => {
     const span = document.createElement("span");
     span.textContent = char;
     span.style.display = "inline-block";
@@ -413,22 +415,118 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Detect scroll to page-2 and trigger box hiding
-  let page2Triggered = false;
-  window.addEventListener("scroll", function () {
-    const page2 = document.querySelector(".page-2");
-    if (!page2) return;
-    const rect = page2.getBoundingClientRect();
-
-    // If top of page-2 is visible in viewport
-    if (rect.top < window.innerHeight && !page2Triggered) {
-      page2Triggered = true;
-      hideBoxesSequentially();
-    }
-
-    // Reset trigger if user scrolls back up
-    if (rect.top > window.innerHeight) {
-      page2Triggered = false;
-    }
+  const page2Timeline = gsap.timeline({
+    scrollTrigger: {
+      trigger: ".page-1",
+      start: "top+=10% top",
+      end: "bottom top",
+      scrub: true,
+      scroller: ".pages",
+      // onEnter: () => {
+      //   document.querySelectorAll(".page-2 .animate-box").forEach((box) => {
+      //     box.style.display = "block";
+      //   });
+      // },
+      // onLeaveBack: () => {
+      //   document.querySelectorAll(".page-2 .animate-box").forEach((box) => {
+      //     gsap.set(box, { clearProps: "all" });
+      //   });
+      //   gsap.set(".page-2", { clearProps: "all" });
+      // },
+    },
   });
+
+  page2Timeline
+    .to(
+      ".page-2",
+      { backgroundColor: "#070707", duration: 3, ease: "power1.inOut" },
+      0
+    )
+    .to(
+      ".page-2 .animate-box",
+      {
+        scale: 0.2,
+        motionPath: {
+          path: [
+            { x: 0, y: -500 }, // hold x, stay vertical
+            { x: 200, y: -400 }, // move right
+            { x: 200, y: -350 }, // move down slightly
+            { x: -200, y: -350 }, // move left
+            { x: -200, y: -300 }, // move down again
+            { x: 200, y: -300 }, // move right
+            { x: 200, y: -250 }, // move down again
+            { x: -200, y: -250 }, // move left
+            { x: -200, y: -200 }, // move down again
+            { x: 200, y: -200 }, // move right
+            { x: 200, y: -150 }, // move down again
+            { x: -200, y: -150 }, // move left
+            { x: -200, y: -100 }, // move down again
+            { x: 200, y: -100 }, // move right
+            { x: 200, y: -50 }, // move down again
+            { x: -200, y: -50 }, // move left
+            { x: -200, y: 0 }, // move down again
+            { x: 200, y: 0 }, // move right
+            { x: 200, y: 50 }, // move down again
+            { x: -100, y: 0 }, // move left
+            { x: 0, y: 300 }, // move down again
+          ],
+          autoRotate: false,
+          curviness: 1,
+        },
+        ease: "power2.inOut",
+        duration: 10,
+      },
+      0
+    )
+    .to(
+      ".page-2 .animate-box",
+      {
+        scale: 1.1,
+        backgroundColor: "rgba(10, 40, 57, 0.86)",
+        transform: "translate(-0%, -30%)",
+        width: "60%",
+        borderRadius: "15px",
+        duration: 1,
+        ease: "power1.inOut",
+        onComplete: () => hideBoxesSequentially(),
+      },
+      ">"
+    )
+    .to(
+      ".page-2 .animate-box",
+      {
+        scale: 1,
+        backgroundColor: "rgba(10, 40, 57, 0.86)",
+        transform: "translate(-0%, 50%)",
+        width: "50%",
+        height: "50%",
+        border: "2px solid rgba(44, 113, 153, 0.86)",
+        borderRadius: "15px",
+        duration: 1,
+        ease: "power1.inOut",
+      },
+      ">+=1"
+    )
+    .to(
+      ".page-2 .animate-box",
+      {
+        y: 0,
+        duration: 1,
+        ease: "power1.inOut",
+      },
+      ">+=1"
+    )
+    .to(".page-2 .animate-box h3", {
+      display: "block",
+    })
+    .fromTo(
+      ".page-2 .animate-box h3",
+      {
+        opacity: 0,
+        duration: 0.5,
+
+        ease: "power1.inOut",
+      },
+      ">+=1"
+    );
 });
