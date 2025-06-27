@@ -418,29 +418,115 @@ document.addEventListener("DOMContentLoaded", function () {
   const page2Timeline = gsap.timeline({
     scrollTrigger: {
       trigger: ".page-1",
-      start: "top top",
+      start: "top+=10% top",
       end: "bottom top",
       scrub: true,
       scroller: ".pages",
+      // onEnter: () => {
+      //   document.querySelectorAll(".page-2 .animate-box").forEach((box) => {
+      //     box.style.display = "block";
+      //   });
+      // },
+      // onLeaveBack: () => {
+      //   document.querySelectorAll(".page-2 .animate-box").forEach((box) => {
+      //     gsap.set(box, { clearProps: "all" });
+      //   });
+      //   gsap.set(".page-2", { clearProps: "all" });
+      // },
     },
   });
 
-  page2Timeline.to(".page-2", { backgroundColor: "#070707" }, 0).to(
-    ".page-2 .box",
-    {
-      rotation: 2860,
-      y: -400,
-      motionPath: {
-        path: [
-          { x: 0, y: 0 },
-          { x: 200, y: 0 },
-          { x: 100, y: -320 },
-          { x: 60, y: -130 },
-          { x: -120, y: 50 },
-          { x: 169, y: 0 },
-        ],
+  page2Timeline
+    .to(
+      ".page-2",
+      { backgroundColor: "#070707", duration: 3, ease: "power1.inOut" },
+      0
+    )
+    .to(
+      ".page-2 .animate-box",
+      {
+        scale: 0.2,
+        motionPath: {
+          path: [
+            { x: 0, y: -500 }, // hold x, stay vertical
+            { x: 200, y: -400 }, // move right
+            { x: 200, y: -350 }, // move down slightly
+            { x: -200, y: -350 }, // move left
+            { x: -200, y: -300 }, // move down again
+            { x: 200, y: -300 }, // move right
+            { x: 200, y: -250 }, // move down again
+            { x: -200, y: -250 }, // move left
+            { x: -200, y: -200 }, // move down again
+            { x: 200, y: -200 }, // move right
+            { x: 200, y: -150 }, // move down again
+            { x: -200, y: -150 }, // move left
+            { x: -200, y: -100 }, // move down again
+            { x: 200, y: -100 }, // move right
+            { x: 200, y: -50 }, // move down again
+            { x: -200, y: -50 }, // move left
+            { x: -200, y: 0 }, // move down again
+            { x: 200, y: 0 }, // move right
+            { x: 200, y: 50 }, // move down again
+            { x: -100, y: 0 }, // move left
+            { x: 0, y: 300 }, // move down again
+          ],
+          autoRotate: false,
+          curviness: 1,
+        },
+        ease: "power2.inOut",
+        duration: 10,
       },
-    },
-    0
-  );
+      0
+    )
+    .to(
+      ".page-2 .animate-box",
+      {
+        scale: 1.1,
+        backgroundColor: "rgba(10, 40, 57, 0.86)",
+        transform: "translate(-0%, -30%)",
+        width: "60%",
+        borderRadius: "15px",
+        duration: 1,
+        ease: "power1.inOut",
+        onComplete: () => hideBoxesSequentially(),
+      },
+      ">"
+    )
+    .to(
+      ".page-2 .animate-box",
+      {
+        scale: 1,
+        backgroundColor: "rgba(10, 40, 57, 0.86)",
+        transform: "translate(-0%, 50%)",
+        width: "50%",
+        height: "50%",
+        border: "2px solid rgba(44, 113, 153, 0.86)",
+        borderRadius: "15px",
+        duration: 1,
+        ease: "power1.inOut",
+      },
+      ">+=1"
+    )
+    .to(
+      ".page-2 .animate-box",
+      {
+        y: 0,
+        duration: 1,
+        ease: "power1.inOut",
+      },
+      ">+=1"
+    )
+    .to(".page-2 .animate-box h3", {
+      display: "block",
+    })
+    .fromTo(
+      ".page-2 .animate-box h3",
+      {
+        opacity: 0,
+        duration: 0.5,
+
+        ease: "power1.inOut",
+      },
+      ">+=1"
+    );
 });
