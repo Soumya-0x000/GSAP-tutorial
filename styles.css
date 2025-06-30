@@ -134,7 +134,9 @@ body {
   height: 100px;
   background: #97f19a;
   border-radius: 8px;
+  overflow: hidden;
 }
 .main-container .pages .page-2 .animate-box h3 {
   display: none;
+  color: #ffc97e;
 }

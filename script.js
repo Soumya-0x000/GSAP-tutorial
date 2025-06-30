@@ -161,16 +161,25 @@ document.addEventListener("DOMContentLoaded", function () {
     stagger: 0.1,
   });
 
-  const text = page1Title.textContent;
-  const splitText = text.split("");
+  const page1Text = page1Title.textContent;
   page1Title.textContent = "";
-  splitText.forEach((char) => {
-    const span = document.createElement("span");
-    span.textContent = char;
-    span.style.display = "inline-block";
-    if (char === " ") span.innerHTML = "&nbsp;";
-    page1Title.appendChild(span);
-  });
+
+  const textSplitter = (text) => {
+    const splitText = text.split("");
+    let title = [];
+    splitText.forEach((char) => {
+      const span = document.createElement("span");
+      span.textContent = char;
+      span.style.display = "inline-block";
+      if (char === " ") span.innerHTML = "&nbsp;";
+      title.push(span);
+    });
+
+    return title;
+  };
+
+  const updatedPage1Title = textSplitter(page1Text);
+  updatedPage1Title.forEach((span) => page1Title.appendChild(span));
 
   // Animate each letter from right to left with stagger
   const letterSpans = page1Title.querySelectorAll("span");
@@ -516,17 +525,62 @@ document.addEventListener("DOMContentLoaded", function () {
       },
       ">+=1"
     )
-    .to(".page-2 .animate-box h3", {
-      display: "block",
-    })
     .fromTo(
       ".page-2 .animate-box h3",
       {
-        opacity: 0,
+        display: "block",
+        y: -50,
+        x: -50,
+        FontFace: "Poppins",
+        opacity: 0.3,
+      },
+      {
+        y: 0,
+        x: 0,
+        marginTop: "2rem",
+        marginLeft: "2rem",
+        opacity: 1,
         duration: 0.5,
-
         ease: "power1.inOut",
       },
       ">+=1"
-    );
+    )
+    .to(".page-2 .animate-box h3", {
+      marginLeft: "0",
+      letterSpacing: "0.1em",
+      color: "rgba(97, 159, 194, 0.86)",
+      duration: 0.5,
+      ease: "power1.inOut",
+      textAlign: "left",
+      display: "flex",
+      justifyContent: "start",
+    })
+    .to(
+      ".page-2 .animate-box h3",
+      {
+        marginLeft: "2rem",
+        textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
+        fontSize: "1.2rem",
+        duration: 0.5,
+        ease: "power1.inOut",
+      },
+      ">+=1"
+    )
+    .to(
+      ".page-2 .animate-box h3",
+      {
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        margin: 0,
+        transform: "translate(-50%, -50%)",
+        duration: 0.5,
+        ease: "power1.inOut",
+      },
+      ">"
+    )
+    // .to(".page-2 .animate-box h3", {
+    //   top: '0%',
+    //   left: '100%'
+    // }, ">+=1");
 });
