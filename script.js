@@ -94,10 +94,10 @@ document.addEventListener("DOMContentLoaded", function () {
         x: mousePosition.x - 50,
         y: mousePosition.y - 50,
       });
-      customCursor.style.left = e.clientX + "px";
-      customCursor.style.top = e.clientY + "px";
+      customCursor.style.left = mousePosition.x + "px";
+      customCursor.style.top = mousePosition.y + "px";
 
-      createCursorTrail(e.clientX, e.clientY);
+      createCursorTrail(mousePosition.x, mousePosition.y);
     }, 150);
 
     // Handle box interaction only if boxes are visible
@@ -141,6 +141,7 @@ document.addEventListener("DOMContentLoaded", function () {
           y: randomY,
           rotation: 0,
           scale: 1,
+          scrub: 1,
           duration: 0.5,
           ease: "power2.out",
         });
@@ -424,12 +425,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  document.querySelector(
+    ".page-2 .animate-box .scrolling-container"
+  ).style.cssText = "display: none; scale: 0";
+
   const page2Timeline = gsap.timeline({
     scrollTrigger: {
       trigger: ".page-1",
       start: "top+=10% top",
-      end: "bottom top",
-      scrub: true,
+      end: "bottom end",
+      scrub: 2,
       scroller: ".pages",
       // onEnter: () => {
       //   document.querySelectorAll(".page-2 .animate-box").forEach((box) => {
@@ -516,71 +521,95 @@ document.addEventListener("DOMContentLoaded", function () {
       },
       ">+=1"
     )
-    .to(
-      ".page-2 .animate-box",
-      {
-        y: 0,
-        duration: 1,
-        ease: "power1.inOut",
-      },
-      ">+=1"
-    )
-    .fromTo(
-      ".page-2 .animate-box h3",
-      {
-        display: "block",
-        y: -50,
-        x: -50,
-        FontFace: "Poppins",
-        opacity: 0.3,
-      },
-      {
-        y: 0,
-        x: 0,
-        marginTop: "2rem",
-        marginLeft: "2rem",
-        opacity: 1,
-        duration: 0.5,
-        ease: "power1.inOut",
-      },
-      ">+=1"
-    )
-    .to(".page-2 .animate-box h3", {
-      marginLeft: "0",
-      letterSpacing: "0.1em",
-      color: "rgba(97, 159, 194, 0.86)",
-      duration: 0.5,
+    .to(".page-2 .animate-box .scrolling-container", {
+      display: "block",
+      scale: 1,
+      duration: 1,
       ease: "power1.inOut",
-      textAlign: "left",
-      display: "flex",
-      justifyContent: "start",
+    });
+
+  // .to(".page-2 .animate-box h3", {
+  //   top: '0%',
+  //   left: '100%'
+  // }, ">+=1");
+
+  const commonClass = ".page-2 .animate-box .scrolling-container";
+  const page2InnerBoxTimeline = gsap.timeline({
+    scrollTrigger: {
+      trigger: ".page-2 .animate-box .scrolling-container",
+      start: "top top",
+      end: "bottom end",
+      scrub: 1,
+      scroller: ".page-2 .animate-box",
+      onComplete: () => {
+        // Hide permanently when scroll animation completes
+        document.querySelector(commonClass).style.display = "none";
+      },
+      onReverseComplete: () => {
+        // Show again if scrolling back to start
+        // document.querySelector(commonClass).style.display = "block";
+      },
+    },
+  });
+
+  page2InnerBoxTimeline
+    .to(commonClass, {
+      scale: 0.5,
+      rotation: -360,
+      borderRadius: "2rem",
     })
-    .to(
-      ".page-2 .animate-box h3",
-      {
-        marginLeft: "2rem",
-        textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
-        fontSize: "1.2rem",
-        duration: 0.5,
-        ease: "power1.inOut",
-      },
-      ">+=1"
-    )
-    .to(
-      ".page-2 .animate-box h3",
-      {
-        position: "absolute",
-        top: "50%",
-        left: "50%",
-        margin: 0,
-        transform: "translate(-50%, -50%)",
-        duration: 0.5,
-        ease: "power1.inOut",
-      },
-      ">"
-    )
-    // .to(".page-2 .animate-box h3", {
-    //   top: '0%',
-    //   left: '100%'
-    // }, ">+=1");
+    .to(commonClass, {
+      backgroundColor: "rgba(109, 109, 23, 0.89)",
+      borderRadius: "100%",
+    });
+  // .to(commonClass, { display: "none" });
+  // .to(commonClass, {
+  //   y: 500,
+  // })
+
+  // .fromTo(
+  //   ".page-2 .animate-box .scrolling-container h3",
+  //   {
+  //     display: "block",
+  //     y: -50,
+  //     x: -50,
+  //     FontFace: "Poppins",
+  //     opacity: 0.3,
+  //   },
+  //   {
+  //     y: 0,
+  //     x: 0,
+  //     marginTop: "2rem",
+  //     marginLeft: "2rem",
+  //     opacity: 1,
+  //     duration: 0.5,
+  //     ease: "power1.inOut",
+  //   }
+  // )
+  // .to(".page-2 .animate-box .scrolling-container h3", {
+  //   marginLeft: "0",
+  //   letterSpacing: "0.1em",
+  //   color: "rgba(97, 159, 194, 0.86)",
+  //   duration: 0.5,
+  //   ease: "power1.inOut",
+  //   textAlign: "left",
+  //   display: "flex",
+  //   justifyContent: "start",
+  // })
+  // .to(".page-2 .animate-box .scrolling-container h3", {
+  //   marginLeft: "2rem",
+  //   textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
+  //   fontSize: "1.2rem",
+  //   duration: 0.5,
+  //   ease: "power1.inOut",
+  // })
+  // .to(".page-2 .animate-box .scrolling-container h3", {
+  //   position: "absolute",
+  //   top: "50%",
+  //   left: "50%",
+  //   margin: 0,
+  //   transform: "translate(-50%, -50%)",
+  //   duration: 0.5,
+  //   ease: "power1.inOut",
+  // });
 });
